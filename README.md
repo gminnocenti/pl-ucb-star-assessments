@@ -4,18 +4,27 @@ Please check out the [csxxx wiki](https://github.com/ace-lab/pl-ucb-csxxx/wiki)
 for basic PrairieLearn mechanics etc.
 
 Here's where to put your stuff.  In the examples below, substitute a
-name/moniker for your course in place of "CS999".
+name/moniker for your course in place of `PROJECT`.
 
 **Remember:** it's fine to copy boilerplate files from other
 directories, but **every PL item has a unique UID (uuid)** and you
 have to change those.  You can generate UUIDs with the shell command `uuidgen`.
 
-## Create and git add the directory `courseInstances/CS999`
+## Develop on a branch
+
+To avoid lots of merge collisions, it's best to do all of the below on a branch
+and use that branch for local testing.  When ready, open a pull request to merge
+your branch to `master` and we will do the merge.  Note that the PR
+should **only** result in changes to `questions/PROJECT/`, `courseInstances/PROJECT/`, and possibly
+adding a new directory under `elements/`.  PRs that make other changes besides
+those will be rejected unless accompanied by an explanation.
+
+## Create and git add the directory `courseInstances/PROJECT`
 
 In it you'll need a minimal `infoCourseInstance.json`, which you can
-base on an existing one.
+base on an existing one, but don't forget to change the uuid's.
 
-## Create and add `questions/CS999/`
+## Create and add `questions/PROJECT/`
 
 This is where your example question(s) will go.
 
@@ -24,20 +33,13 @@ This is where your example question(s) will go.
 ...where * is whatever your element name is.
 
 **At this point**, all of your work should be able to go into either a
-question subdirectory or the single element subdirectory.  If you find
+question subdirectory or the element subdirectory.  If you find
 yourself in a situation where you have code that doesn't belong in
 either of those places, ask us.  The reason is to keep each project
 standalone: it should be possible for an instructor to use the project
 simply by copying any `questions/CS999/` subdirectories and optionally
 any element subdirectories, nothing else.
 
-## Develop on a branch
-
-To avoid lots of merge collisions, it's best to develop on a branch
-and use that branch for local testing.  At the end of the semester, we
-can merge your branch to `master` if you open a PR.  Note that the PR
-should **only** result in changes to `questions/CS999/` and possibly
-to your element subdirs.
 
 ## Packaging milestone
 
