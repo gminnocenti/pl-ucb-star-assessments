@@ -44,7 +44,7 @@ any element subdirectories, nothing else.
 
 Add at least one `courseInstances/PROJECT/assessments/example/infoAssessment.json` that 
 sequences your demo question(s), providing an easy way to preview multiple questions in your 
-project at once.
+project at once.  You can setup the assessment as  "homework" allowing unlimited attempts and so forth. [Here's the documentation](https://prairielearn.readthedocs.io/en/latest/assessment/) for doing that.
 
 ## Packaging milestone
 
