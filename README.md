@@ -40,6 +40,11 @@ standalone: it should be possible for an instructor to use the project
 simply by copying any `questions/CS999/` subdirectories and optionally
 any element subdirectories, nothing else.
 
+## Ideally, add an Assessment in your course instance
+
+Add at least one `courseInstances/PROJECT/assessments/example/infoAssessment.json` that 
+sequences your demo question(s), providing an easy way to preview multiple questions in your 
+project at once.
 
 ## Packaging milestone
 
