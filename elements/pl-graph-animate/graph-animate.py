@@ -9,6 +9,7 @@ import os
 import tempfile
 import lxml
 import base64
+from typing import List
 
 # Default parameters
 ENGINE_DEFAULT = "dot"
@@ -21,7 +22,7 @@ SHOW_WEIGHTS_DEFAULT="False"
 
 
 
-def generate_frames_bfs_from_matrix(matrix, start_node, show_steps, show_weights,directed, size="5,5"):
+def generate_frames_bfs_from_matrix(matrix, start_node, show_steps, show_weights,directed, size="5,5")-> List:
     if isinstance(matrix, np.ndarray):  
         if directed=="True":
             G = nx.from_numpy_array(matrix, create_using=nx.DiGraph())  
@@ -74,7 +75,7 @@ def generate_frames_bfs_from_matrix(matrix, start_node, show_steps, show_weights
     return frames
 
 
-def generate_frames_dfs_from_matrix(matrix, start_node, show_steps, show_weights, directed,size="5,5"):
+def generate_frames_dfs_from_matrix(matrix, start_node, show_steps, show_weights, directed,size="5,5")-> List:
     if isinstance(matrix, np.ndarray):  
         if directed=="True":
             G = nx.from_numpy_array(matrix, create_using=nx.DiGraph())  
@@ -134,7 +135,7 @@ def generate_frames_dfs_from_matrix(matrix, start_node, show_steps, show_weights
 
     return frames
 
-def generate_frames_dijkstra_from_matrix(matrix, start_node, show_steps, show_weights,directed, size="5,5"):
+def generate_frames_dijkstra_from_matrix(matrix, start_node, show_steps, show_weights,directed, size="5,5")-> List:
     if isinstance(matrix, np.ndarray):
         if directed=="True":
             G = nx.from_numpy_array(matrix, create_using=nx.DiGraph())
@@ -193,7 +194,7 @@ def generate_frames_dijkstra_from_matrix(matrix, start_node, show_steps, show_we
 
     return frames
 
-def create_graph_frame_dotty(dot_commands_dict,size="5,5"):
+def create_graph_frame_dotty(dot_commands_dict,size="5,5")-> List:
     frames = []
     for step, dot_command in dot_commands_dict.items():
         # Create a Pygraphviz AGraph object from the DOT command string
@@ -207,15 +208,6 @@ def create_graph_frame_dotty(dot_commands_dict,size="5,5"):
     return frames 
 
 
-
-# Function to combine frames into a video
-def create_video_from_frames(frames, output_file, frame_duration):
-    clips = [mpy.ImageClip(f).set_duration(frame_duration) for f in frames]
-    video = mpy.concatenate_videoclips(clips, method="compose")
-    
-    
-    video.write_videofile(output_file, fps=24, verbose=False, logger=None)
-
 def create_weighted_graph(matrix):
     G = nx.Graph()  
     size = matrix.shape[0]
@@ -225,6 +217,13 @@ def create_weighted_graph(matrix):
             if weight != 0 and weight != 100: 
                 G.add_edge(chr(65 + i), chr(65 + j), weight=weight)  
     return G
+
+# Function to combine frames list  into a video
+def create_video_from_frames(frames, output_file, frame_duration):
+    clips = [mpy.ImageClip(f).set_duration(frame_duration) for f in frames]
+    video = mpy.concatenate_videoclips(clips, method="compose")
+    video.write_videofile(output_file, fps=24, verbose=False, logger=None)
+
 def check_parameters(element_html: str, data: pl.QuestionData) -> None:
     """
     Validates the parameters extracted from the element_html and data.
@@ -257,20 +256,45 @@ def check_parameters(element_html: str, data: pl.QuestionData) -> None:
 
         show_steps = pl.get_string_attrib(element, "show-steps", SHOW_STEPS_DEFAULT)
         if show_steps not in ["True", "False"]:
-            raise ValueError("Invalid 'show-steps': must be 'true' or 'false'.")
+            raise ValueError("Invalid 'show-steps': must be True or False.")
 
         show_weights = pl.get_string_attrib(element, "show-weights", SHOW_WEIGHTS_DEFAULT)
         if show_weights not in ["True", "False"]:
-            raise ValueError("Invalid 'show-weights': must be 'true' or 'false'.")
+            raise ValueError("Invalid 'show-weights': must be True or False.")
 
         directed_graph = pl.get_string_attrib(element, "directed-graph", DIRECTED_DEFAULT)
         if directed_graph not in ["True", "False"]:
-            raise ValueError("Invalid 'directed-graph': must be 'true' or 'false'.")
+            raise ValueError("Invalid 'directed-graph': must be True or False.")
+        if input_type == PARAMS_TYPE_DEFAULT:
+            try:
+                matrix = np.array(pl.from_json(data["params"][input_param_name]))
+                if not isinstance(matrix, np.ndarray):
+                    raise ValueError("Invalid adjacency matrix: must be an np.array.")
+                if matrix.ndim != 2 or matrix.shape[0] != matrix.shape[1]:
+                    raise ValueError("Invalid adjacency matrix: must be a square 2D array.")
+            except Exception:
+                raise ValueError("Invalid JSON format for adjacency matrix.")
+        if input_type == "dotty":
+            try:
+                # Convert the input parameter to a Python object
+                dot_commands_dict = pl.from_json(data["params"][input_param_name])
+                
+                # Validate that the result is a Python dictionary
+                if not isinstance(dot_commands_dict, dict):
+                    raise ValueError("Invalid dotty commands: must be a Python dictionary.")
+            except Exception:
+                raise ValueError("Invalid JSON format for dotty commands.")
+
     except Exception as e:
         raise ValueError(f"Parameter validation failed: {e}")
+
+
+
+
 def render(element_html: str, data: pl.QuestionData) -> str:
-    # Parse the input parameters
+    #check that all parameters are in the correct format
     check_parameters(element_html, data)
+    # Parse the input parameters
     element = lxml.html.fragment_fromstring(element_html)
     input_param_name = pl.get_string_attrib(element, "params-name")
     input_type = pl.get_string_attrib(element, "params-type", PARAMS_TYPE_DEFAULT)
@@ -279,34 +303,24 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     show_steps = pl.get_string_attrib(element, "show-steps", SHOW_STEPS_DEFAULT)
     show_weights = pl.get_string_attrib(element, "show-weights", SHOW_WEIGHTS_DEFAULT)
     directed_graph=pl.get_string_attrib(element, "directed-graph", DIRECTED_DEFAULT)
-    # Create video for input type adjacency-matrix
+    # Create video for input type adjacency-matrix or PARAMS_TYPE_DEFAULT
     if input_type==PARAMS_TYPE_DEFAULT:
         matrix = np.array(pl.from_json(data["params"][input_param_name]))
-        
-
         start_node = 0  # Assuming traversal starts at node 0
         if algorithm == "dfs":
-
             frames=generate_frames_dfs_from_matrix(matrix, start_node,show_steps,show_weights,directed_graph)
         elif algorithm == "bfs":
-
             frames=generate_frames_bfs_from_matrix(matrix, start_node,show_steps,show_weights,directed_graph)
         elif algorithm == "dijkstra":
-
             frames=generate_frames_dijkstra_from_matrix(matrix, start_node,show_steps,show_weights,directed_graph)
-
         else:
-            raise ValueError(f"Unsupported algorithm: {algorithm}")
-    
+            raise ValueError(f"Unsupported algorithm: {algorithm}")        
     
     # Create video for input type dotty
     elif input_type=="dotty":
         dot_commands_dict = pl.from_json(data["params"][input_param_name])
         frames = create_graph_frame_dotty(dot_commands_dict)
         output_file = tempfile.NamedTemporaryFile(suffix=".mp4", delete=False).name
-    
-    
-    
     
     # Save the video to a temporary file
     output_file = tempfile.NamedTemporaryFile(suffix=".mp4", delete=False).name
