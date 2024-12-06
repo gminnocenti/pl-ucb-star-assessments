@@ -2,6 +2,7 @@ import networkx as nx
 import pygraphviz as pgv
 import numpy as np
 import prairielearn as pl
+import moviepy
 import moviepy.editor as mpy
 import warnings
 import os
