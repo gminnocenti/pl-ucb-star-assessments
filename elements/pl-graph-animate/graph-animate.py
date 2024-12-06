@@ -225,9 +225,52 @@ def create_weighted_graph(matrix):
             if weight != 0 and weight != 100: 
                 G.add_edge(chr(65 + i), chr(65 + j), weight=weight)  
     return G
+def check_parameters(element_html: str, data: pl.QuestionData) -> None:
+    """
+    Validates the parameters extracted from the element_html and data.
+    Raises a ValueError if any parameter has the wrong format.
+    """
+    try:
+        # Parse the element
+        element = lxml.html.fragment_fromstring(element_html)
 
+        # Validate individual parameters
+        input_param_name = pl.get_string_attrib(element, "params-name")
+        if not isinstance(input_param_name, str) or not input_param_name:
+            raise ValueError("Invalid 'params-name': must be a non-empty string.")
+
+        input_type = pl.get_string_attrib(element, "params-type", PARAMS_TYPE_DEFAULT)
+        if input_type not in [PARAMS_TYPE_DEFAULT, "dotty"]:
+            raise ValueError(f"Invalid 'params-type': {input_type}. Must be 'adjacency-matrix' or 'dotty'.")
+
+        algorithm = pl.get_string_attrib(element, "algorithm", ALGORITHM_DEFAULT).lower()
+        if algorithm not in ["dfs", "bfs", "dijkstra"]:
+            raise ValueError(f"Invalid 'algorithm': {algorithm}. Supported algorithms are 'dfs', 'bfs', or 'dijkstra'.")
+
+        frame_duration = pl.get_string_attrib(element, "frame-duration", DURATION_FRAME_DEFAULT)
+        try:
+            frame_duration = float(frame_duration)
+            if frame_duration <= 0:
+                raise ValueError
+        except ValueError:
+            raise ValueError("Invalid 'frame-duration': must be a positive float.")
+
+        show_steps = pl.get_string_attrib(element, "show-steps", SHOW_STEPS_DEFAULT)
+        if show_steps not in ["True", "False"]:
+            raise ValueError("Invalid 'show-steps': must be 'true' or 'false'.")
+
+        show_weights = pl.get_string_attrib(element, "show-weights", SHOW_WEIGHTS_DEFAULT)
+        if show_weights not in ["True", "False"]:
+            raise ValueError("Invalid 'show-weights': must be 'true' or 'false'.")
+
+        directed_graph = pl.get_string_attrib(element, "directed-graph", DIRECTED_DEFAULT)
+        if directed_graph not in ["True", "False"]:
+            raise ValueError("Invalid 'directed-graph': must be 'true' or 'false'.")
+    except Exception as e:
+        raise ValueError(f"Parameter validation failed: {e}")
 def render(element_html: str, data: pl.QuestionData) -> str:
     # Parse the input parameters
+    check_parameters(element_html, data)
     element = lxml.html.fragment_fromstring(element_html)
     input_param_name = pl.get_string_attrib(element, "params-name")
     input_type = pl.get_string_attrib(element, "params-type", PARAMS_TYPE_DEFAULT)
