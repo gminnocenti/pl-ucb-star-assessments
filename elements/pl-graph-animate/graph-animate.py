@@ -115,46 +115,35 @@ def generate_frames_dfs_from_matrix(matrix, start_node, show_steps, show_weights
 
     A = nx.nx_agraph.to_agraph(G)
 
-    # Get DFS traversal order
-    dfs_edges = list(nx.dfs_edges(G, source=start_node))  # List of edges traversed in DFS
-    dfs_nodes = list(nx.dfs_preorder_nodes(G, source=start_node))  # List of nodes in DFS order
+    dfs_edges = list(nx.dfs_edges(G, source=start_node)) 
+    dfs_nodes = list(nx.dfs_preorder_nodes(G, source=start_node)) 
 
-    # List to store frames for the animation
     frames = []
-
     for i in range(1, len(dfs_nodes) + 1):
         A_temp = A.copy()
-        # Highlight nodes in DFS order
         nodes_to_highlight = dfs_nodes[:i]
         for node in nodes_to_highlight:
             A_temp.get_node(node).attr['color'] = 'red'
             A_temp.get_node(node).attr['style'] = 'filled'
             A_temp.get_node(node).attr['fillcolor'] = 'red'
 
-        # Highlight edges in DFS order
         edges_to_highlight = dfs_edges[:i-1] 
         for edge in edges_to_highlight:
             A_temp.get_edge(edge[0], edge[1]).attr['color'] = 'blue'
             A_temp.get_edge(edge[0], edge[1]).attr['penwidth'] = 2.5
-
-        # Optionally set the graph title to indicate the current step and node
         if show_steps==True:
             A_temp.graph_attr['label'] = f"Step {i}: Current Node {dfs_nodes[i-1]} (DFS)"
             A_temp.graph_attr['labelloc'] = 'top'
         else: 
             pass
-
         if show_weights==True:
             for u, v, data in G.edges(data=True):
-                weight = data.get('weight', 1.0)  # Default weight if not present
+                weight = data.get('weight', 1.0)  
                 A_temp.get_edge(u, v).attr['label'] = str(weight)
         else:
             pass
-
-        # Set the size of the graph image
         A_temp.graph_attr['size'] = size
         A_temp.graph_attr['dpi'] = "300"
-
         # Save the graph to a temporary file
         temp_file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
         A_temp.draw(temp_file.name, format="png", prog="dot")
