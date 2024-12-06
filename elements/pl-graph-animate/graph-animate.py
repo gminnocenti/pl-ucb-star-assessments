@@ -237,6 +237,15 @@ def generate_frames_dijkstra_from_matrix(matrix, start_node, show_steps, show_we
     return frames
 
 def create_graph_frame_dotty(dot_commands_dict,size="5,5")-> List:
+    """
+    **Parameters:**
+    
+    - `dot_commands_dict`: A dictionary where keys represent steps and values are DOT command strings that define the graph at each step.
+    - `size`: String specifying the size of the graph visualization in "width,height" format. Default is "5,5".
+        
+    The function generates a sequence of graph visualizations (frames) based on a dictionary of DOT commands. Each DOT command describes a specific state or configuration of the graph at a given step.
+    The function saves each graph visualization as a temporary `.png` file and appends the file path to a list, which is returned as the output.
+    """
     frames = []
     for step, dot_command in dot_commands_dict.items():
         # Create a Pygraphviz AGraph object from the DOT command string
@@ -250,18 +259,12 @@ def create_graph_frame_dotty(dot_commands_dict,size="5,5")-> List:
     return frames 
 
 
-def create_weighted_graph(matrix):
-    G = nx.Graph()  
-    size = matrix.shape[0]
-    for i in range(size):
-        for j in range(size):
-            weight = matrix[i][j]
-            if weight != 0 and weight != 100: 
-                G.add_edge(chr(65 + i), chr(65 + j), weight=weight)  
-    return G
 
 # Function to combine frames list  into a video
 def create_video_from_frames(frames, output_file, frame_duration):
+    """
+    This functions takes as input a list with frames as temporary png files and creates a mp4 video based on the frame duration.
+    """
     clips = [mpy.ImageClip(f).set_duration(frame_duration) for f in frames]
     video = mpy.concatenate_videoclips(clips, method="compose")
     video.write_videofile(output_file, fps=24, verbose=False, logger=None)
@@ -271,7 +274,7 @@ def check_parameters(element_html: str, data: pl.QuestionData) -> None:
     Validates that the parameters are in the correct format
     """
     try:
-        # Parse the element
+        
         element = lxml.html.fragment_fromstring(element_html)
 
         # Validate individual parameters
@@ -306,6 +309,7 @@ def check_parameters(element_html: str, data: pl.QuestionData) -> None:
         directed_graph = pl.get_boolean_attrib(element, "directed-graph", DIRECTED_DEFAULT)
         if directed_graph not in [True, False]:
             raise ValueError("Invalid 'directed-graph': must be True or False.")
+         # check input for PARAMS_TYPE_DEFAULT type is a 2d array
         if input_type == PARAMS_TYPE_DEFAULT:
             try:
                 matrix = np.array(pl.from_json(data["params"][input_param_name]))
@@ -315,12 +319,12 @@ def check_parameters(element_html: str, data: pl.QuestionData) -> None:
                     raise ValueError("Invalid adjacency matrix: must be a square 2D array.")
             except Exception:
                 raise ValueError("Invalid JSON format for adjacency matrix.")
+        # check input for dotty type is a dictionary
         if input_type == "dotty":
             try:
-                # Convert the input parameter to a Python object
+                
                 dot_commands_dict = pl.from_json(data["params"][input_param_name])
                 
-                # Validate that the result is a Python dictionary
                 if not isinstance(dot_commands_dict, dict):
                     raise ValueError("Invalid dotty commands: must be a Python dictionary.")
             except Exception:
@@ -347,7 +351,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     # Create video for input type adjacency-matrix or PARAMS_TYPE_DEFAULT
     if input_type==PARAMS_TYPE_DEFAULT:
         matrix = np.array(pl.from_json(data["params"][input_param_name]))
-        start_node = 0  # Assuming traversal starts at node 0
+        start_node = 0 
         if algorithm == "dfs":
             frames=generate_frames_dfs_from_matrix(matrix, start_node,show_steps,show_weights,directed_graph)
         elif algorithm == "bfs":
