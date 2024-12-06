@@ -14,17 +14,31 @@ from typing import List
 # Default parameters
 ENGINE_DEFAULT = "dot"
 PARAMS_TYPE_DEFAULT = "adjacency-matrix"
-DIRECTED_DEFAULT = "False"
+DIRECTED_DEFAULT = False
 DURATION_FRAME_DEFAULT = 2
 ALGORITHM_DEFAULT = "dfs"
-SHOW_STEPS_DEFAULT="True"
-SHOW_WEIGHTS_DEFAULT="False"
+SHOW_STEPS_DEFAULT=True
+SHOW_WEIGHTS_DEFAULT=False
 
 
 
 def generate_frames_bfs_from_matrix(matrix, start_node, show_steps, show_weights,directed, size="5,5")-> List:
+    """
+    **Parameters:**
+    
+    - `matrix`: Input adjacency matrix (numpy array or NetworkX graph) representing the graph.
+    - `start_node`: Node from which the BFS traversal starts.
+    - `show_steps`: Boolean-like string indicating whether to display step-by-step information in the graph (e.g., current node).
+    - `show_weights`: Boolean-like string indicating whether to display edge weights in the visualization.
+    - `directed`: Boolean-like string indicating whether the graph is directed or undirected.
+    - `size`: String specifying the size of the graph visualization in "width,height" format. Default is "5,5".      
+    
+    The function generates a sequence of graph visualizations (frames) showing the progression of a Breadth-First Search (BFS) traversal. It highlights visited nodes and traversed edges step-by-step,
+    optionally including step annotations and edge weights. 
+    Each frame is saved as a temporary `.png` file and added to a list, which is returned as the function's output.
+    """
     if isinstance(matrix, np.ndarray):  
-        if directed=="True":
+        if directed==True:
             G = nx.from_numpy_array(matrix, create_using=nx.DiGraph())  
         else:
             G = nx.from_numpy_array(matrix)
@@ -51,13 +65,13 @@ def generate_frames_bfs_from_matrix(matrix, start_node, show_steps, show_weights
             A_temp.get_edge(edge[0], edge[1]).attr['color'] = 'blue'
             A_temp.get_edge(edge[0], edge[1]).attr['penwidth'] = 2.5
 
-        if show_steps=="True":
+        if show_steps==True:
             A_temp.graph_attr['label'] = f"Step {i}: Current Node {bfs_nodes[i-1]} (BFS)"
             A_temp.graph_attr['labelloc'] = 'top'
         else:
             pass
 
-        if show_weights=="True":
+        if show_weights==True:
             for u, v, data in G.edges(data=True):
                 weight = data.get('weight', 1.0)  
                 A_temp.get_edge(u, v).attr['label'] = str(weight)
@@ -76,8 +90,22 @@ def generate_frames_bfs_from_matrix(matrix, start_node, show_steps, show_weights
 
 
 def generate_frames_dfs_from_matrix(matrix, start_node, show_steps, show_weights, directed,size="5,5")-> List:
+    """
+    **Parameters:**
+    
+    - `matrix`: Input adjacency matrix (numpy array or NetworkX graph) representing the graph.
+    - `start_node`: Node from which the BFS traversal starts.
+    - `show_steps`: Boolean-like string indicating whether to display step-by-step information in the graph (e.g., current node).
+    - `show_weights`: Boolean-like string indicating whether to display edge weights in the visualization.
+    - `directed`: Boolean-like string indicating whether the graph is directed or undirected.
+    - `size`: String specifying the size of the graph visualization in "width,height" format. Default is "5,5".      
+    
+    The function generates a sequence of graph visualizations (frames) showing the progression of a Depth-First Search (DFS) traversal. It highlights visited nodes and traversed edges step-by-step,
+    optionally including step annotations and edge weights. 
+    Each frame is saved as a temporary `.png` file and added to a list, which is returned as the function's output.
+    """
     if isinstance(matrix, np.ndarray):  
-        if directed=="True":
+        if directed==True:
             G = nx.from_numpy_array(matrix, create_using=nx.DiGraph())  
         else:
             G = nx.from_numpy_array(matrix)
@@ -110,13 +138,13 @@ def generate_frames_dfs_from_matrix(matrix, start_node, show_steps, show_weights
             A_temp.get_edge(edge[0], edge[1]).attr['penwidth'] = 2.5
 
         # Optionally set the graph title to indicate the current step and node
-        if show_steps=="True":
+        if show_steps==True:
             A_temp.graph_attr['label'] = f"Step {i}: Current Node {dfs_nodes[i-1]} (DFS)"
             A_temp.graph_attr['labelloc'] = 'top'
         else: 
             pass
 
-        if show_weights=="True":
+        if show_weights==True:
             for u, v, data in G.edges(data=True):
                 weight = data.get('weight', 1.0)  # Default weight if not present
                 A_temp.get_edge(u, v).attr['label'] = str(weight)
@@ -136,8 +164,22 @@ def generate_frames_dfs_from_matrix(matrix, start_node, show_steps, show_weights
     return frames
 
 def generate_frames_dijkstra_from_matrix(matrix, start_node, show_steps, show_weights,directed, size="5,5")-> List:
+    """
+    **Parameters:**
+    
+    - `matrix`: Input adjacency matrix (numpy array or NetworkX graph) representing the graph.
+    - `start_node`: Node from which the BFS traversal starts.
+    - `show_steps`: Boolean-like string indicating whether to display step-by-step information in the graph (e.g., current node).
+    - `show_weights`: Boolean-like string indicating whether to display edge weights in the visualization.
+    - `directed`: Boolean-like string indicating whether the graph is directed or undirected.
+    - `size`: String specifying the size of the graph visualization in "width,height" format. Default is "5,5".      
+    
+    The function generates a sequence of graph visualizations (frames) showing the progression of a Dijkstras traversal. It highlights visited nodes and traversed edges step-by-step,
+    optionally including step annotations and edge weights. 
+    Each frame is saved as a temporary `.png` file and added to a list, which is returned as the function's output.
+    """
     if isinstance(matrix, np.ndarray):
-        if directed=="True":
+        if directed==True:
             G = nx.from_numpy_array(matrix, create_using=nx.DiGraph())
         else:
             G = nx.from_numpy_array(matrix)
@@ -172,13 +214,13 @@ def generate_frames_dijkstra_from_matrix(matrix, start_node, show_steps, show_we
             A_temp.get_edge(edge[0], edge[1]).attr['color'] = 'blue'
             A_temp.get_edge(edge[0], edge[1]).attr['penwidth'] = 2.5
 
-        if show_steps=="True":
+        if show_steps==True:
             A_temp.graph_attr['label'] = f"Target Node {target_node}: Shortest Path (Dijkstra)"
             A_temp.graph_attr['labelloc'] = 'top'
         else:
             pass
 
-        if show_weights=="True":
+        if show_weights==True:
             for u, v, data in G.edges(data=True):
                 weight = data.get('weight', 1.0)
                 A_temp.get_edge(u, v).attr['label'] = str(weight)
@@ -226,8 +268,7 @@ def create_video_from_frames(frames, output_file, frame_duration):
 
 def check_parameters(element_html: str, data: pl.QuestionData) -> None:
     """
-    Validates the parameters extracted from the element_html and data.
-    Raises a ValueError if any parameter has the wrong format.
+    Validates that the parameters are in the correct format
     """
     try:
         # Parse the element
@@ -254,16 +295,16 @@ def check_parameters(element_html: str, data: pl.QuestionData) -> None:
         except ValueError:
             raise ValueError("Invalid 'frame-duration': must be a positive float.")
 
-        show_steps = pl.get_string_attrib(element, "show-steps", SHOW_STEPS_DEFAULT)
-        if show_steps not in ["True", "False"]:
+        show_steps = pl.get_boolean_attrib(element, "show-steps", SHOW_STEPS_DEFAULT)
+        if show_steps not in [True, False]:
             raise ValueError("Invalid 'show-steps': must be True or False.")
 
-        show_weights = pl.get_string_attrib(element, "show-weights", SHOW_WEIGHTS_DEFAULT)
-        if show_weights not in ["True", "False"]:
+        show_weights = pl.get_boolean_attrib(element, "show-weights", SHOW_WEIGHTS_DEFAULT)
+        if show_weights not in [True, False]:
             raise ValueError("Invalid 'show-weights': must be True or False.")
 
-        directed_graph = pl.get_string_attrib(element, "directed-graph", DIRECTED_DEFAULT)
-        if directed_graph not in ["True", "False"]:
+        directed_graph = pl.get_boolean_attrib(element, "directed-graph", DIRECTED_DEFAULT)
+        if directed_graph not in [True, False]:
             raise ValueError("Invalid 'directed-graph': must be True or False.")
         if input_type == PARAMS_TYPE_DEFAULT:
             try:
@@ -300,9 +341,9 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     input_type = pl.get_string_attrib(element, "params-type", PARAMS_TYPE_DEFAULT)
     algorithm = pl.get_string_attrib(element, "algorithm", ALGORITHM_DEFAULT).lower() 
     frame_duration = float(pl.get_string_attrib(element, "frame-duration", DURATION_FRAME_DEFAULT))
-    show_steps = pl.get_string_attrib(element, "show-steps", SHOW_STEPS_DEFAULT)
-    show_weights = pl.get_string_attrib(element, "show-weights", SHOW_WEIGHTS_DEFAULT)
-    directed_graph=pl.get_string_attrib(element, "directed-graph", DIRECTED_DEFAULT)
+    show_steps = pl.get_boolean_attrib(element, "show-steps", SHOW_STEPS_DEFAULT)
+    show_weights = pl.get_boolean_attrib(element, "show-weights", SHOW_WEIGHTS_DEFAULT)
+    directed_graph=pl.get_boolean_attrib(element, "directed-graph", DIRECTED_DEFAULT)
     # Create video for input type adjacency-matrix or PARAMS_TYPE_DEFAULT
     if input_type==PARAMS_TYPE_DEFAULT:
         matrix = np.array(pl.from_json(data["params"][input_param_name]))

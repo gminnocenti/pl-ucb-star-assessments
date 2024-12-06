@@ -81,34 +81,7 @@ def generate(data):
 <br>
 <img src="image-1.png" alt="Algorithm-Based Animation DFS Example Question 1 Second Step " width="300">
 <br>
-This example is for a animation with a the minimum amount of necessary parameters to create a animation. This animation will execute the bfs algorithm with a 2 second duration for each frame (step) and will show the title.
-```html
-<pl-graph-animate 
-    params-name="matrix" 
-    algorithm="bfs"> 
-</pl-graph-animate>
-```
-- server.py
-    - This is how to properly declare the adjacency matrix in the server.py
 
-```python
-import prairielearn as pl
-import numpy as np
-
-def generate(data):
-    mat=np.array([[0, 1, 0, 1, 0],
-                         [1, 0, 1, 0, 0],
-                         [0, 1, 0, 0, 1],
-                         [1, 0, 0, 0, 0],
-                         [0, 0, 1, 0, 0]])
-
-    data["params"]["matrix"] = pl.to_json(mat)
-```
-**PrairieLearn Visualization**<br>
-<img src="image-2.png" alt="Algorithm-Based Animation DFS Example Question 2 First Step " width="300">
-<br>
-<img src="image-3.png" alt="Algorithm-Based Animation DFS Example Question 2 Second Step " width="300">
-<br>
 
 ## DOT Command Dictionary  
  Create animations by defining a graph through a python dictionary containing a list of DOT commands. Each step will be a frame in the animation.
