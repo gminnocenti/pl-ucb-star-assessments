@@ -5,7 +5,11 @@
 The `pl-graph-animate` element is a powerful tool for creating engaging and visually dynamic animations of graph-related problems within the PrairieLearn platform. Designed to aid in the teaching and learning of graph algorithms, this element offers a flexible approach to building animations that showcase how these algorithms operate step-by-step.
 
 `pl-graph-animate` provides two intuitive methods to generate animations:
-
+## Requisites
+At the moment one of the libraries named moviepy is not suppported by the PrairieLearn environment. It must be added locally. You can achieve this by running the following command 
+```bash
+docker run -it --rm -v <path-to-course>:/course prairielearn/prairielearn pip3 install --target /course/serverFilesCourse moviepy
+```
 ## Algorithm-Based Animation: 
    Create animations by defining a graph through its adjacency matrix and specifying an algorithm to execute. Currently supported algorithms include:
    - Breadth-First Search (BFS)
